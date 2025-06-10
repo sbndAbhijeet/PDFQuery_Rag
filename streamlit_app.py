@@ -32,6 +32,21 @@ def set_background_image(url):
 
 set_background_image("https://media.istockphoto.com/id/1434278254/vector/blue-and-pink-light-panoramic-defocused-blurred-motion-gradient-abstract-background-vector.jpg?s=612x612&w=0&k=20&c=_KXodNw25trgE0xDe0zFnzNiofFgV50aajKpcI9x_8I=")
 
+with st.sidebar:
+    st.header("🔐 Gemini API Configuration")
+    api_key_input = st.text_input("Enter Gemini API Key", type="password")
+    connect = st.button("Connect")
+
+
+api_key = ''
+if connect:
+    if api_key_input:
+        st.session_state["gemini_api_key"] = api_key_input
+        api_key = api_key_input
+        st.success("✅ API key saved in session.")
+    else:
+        st.error("❌ Please enter a valid API key.")
+
 st.header("PDFQuery 🗣️ (Talk with your pdf)")
 
 col1, col2 = st.columns(2)
@@ -81,16 +96,23 @@ if uploaded_file is not None:
         st.rerun()
 
 
+    if "gemini_api_key" in st.session_state:
+        try:
+            client = OpenAI(
+                api_key=st.session_state["gemini_api_key"],
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+            )
 
-    client = OpenAI(
-        api_key=os.getenv("GEMINI_API_KEY"),
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
+            embedding_model = GoogleGenerativeAIEmbeddings(
+                google_api_key=st.session_state["gemini_api_key"],
+                model="models/embedding-001"
+            )
+            st.success("🎉 Gemini client initialized successfully!")
+        except Exception as e:
+            st.error(f"🚨 Failed to initialize Gemini client: {e}")
+    else:
+        st.warning("🔑 Please enter your Gemini API key in the sidebar.")
 
-    embedding_model = GoogleGenerativeAIEmbeddings(
-        google_api_key=os.getenv("GEMINI_API_KEY"),
-        model="models/embedding-001"
-    )
 
     clientQ = QdrantClient(
         url="http://localhost:6333"

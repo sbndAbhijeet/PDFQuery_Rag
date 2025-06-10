@@ -8,6 +8,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
+from streamlit_app import api_key
 
 load_dotenv()
 
@@ -32,7 +33,7 @@ def create_vector_db(saved_file,uploaded_file):
     #creating Vector embeddings
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001",
-        google_api_key=os.getenv("GEMINI_API_KEY")
+        google_api_key=api_key
     )
 
     #storing vectordb in qdrant
