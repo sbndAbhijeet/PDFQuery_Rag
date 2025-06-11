@@ -10,6 +10,8 @@ from qdrant_client import QdrantClient
 
 load_dotenv()
 
+qdrant_url = "https://53aa128e-3d01-47a3-8c47-590f48a94dd2.europe-west3-0.gcp.cloud.qdrant.io:6333"
+
 if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -32,9 +34,15 @@ def set_background_image(url):
 
 set_background_image("https://media.istockphoto.com/id/1434278254/vector/blue-and-pink-light-panoramic-defocused-blurred-motion-gradient-abstract-background-vector.jpg?s=612x612&w=0&k=20&c=_KXodNw25trgE0xDe0zFnzNiofFgV50aajKpcI9x_8I=")
 
+
+st.header("PDFQuery 🗣️ (Talk with your pdf)")
+
 with st.sidebar:
     st.header("🔐 Gemini API Configuration")
+    st.write(f"If you don't have create one its free: ")
+    st.link_button("click here","https://aistudio.google.com/app/apikey")
     api_key_input = st.text_input("Enter Gemini API Key", type="password")
+
     connect = st.button("Connect")
 
 
@@ -47,9 +55,9 @@ if connect:
     else:
         st.error("❌ Please enter a valid API key.")
 
-st.header("PDFQuery 🗣️ (Talk with your pdf)")
 
 col1, col2 = st.columns(2)
+
 # To upload and save to uploaded_pdfs
 with col1:
     uploaded_file = st.file_uploader("Upload a PDF filie", type='pdf')
@@ -115,16 +123,18 @@ if uploaded_file is not None:
 
 
     clientQ = QdrantClient(
-        url="http://localhost:6333"
+        url=qdrant_url,
+        api_key=os.getenv("QDRANT_API_KEY")
     )
     collections = clientQ.get_collections().collections
     collection_names = [col.name for col in collections]
 
     if uploaded_file.name in collection_names:
         vector_db = QdrantVectorStore.from_existing_collection(
-            url="http://localhost:6333",
+            url=qdrant_url,
             collection_name=uploaded_file.name,
-            embedding=embedding_model
+            embedding=embedding_model,
+            api_key=os.getenv("QDRANT_API_KEY")
         )
 
 

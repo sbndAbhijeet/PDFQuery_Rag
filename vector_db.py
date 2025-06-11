@@ -11,7 +11,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 load_dotenv()
 
-qdrant_url = "http://localhost:6333"
+qdrant_url = "https://53aa128e-3d01-47a3-8c47-590f48a94dd2.europe-west3-0.gcp.cloud.qdrant.io:6333"
 
 
 def create_vector_db(saved_file,uploaded_file):
@@ -48,7 +48,8 @@ def create_vector_db(saved_file,uploaded_file):
 
 
 client = QdrantClient(
-    url=qdrant_url
+    url=qdrant_url,
+    api_key=os.getenv("QDRANT_API_KEY")
 )
 
 def delete_vector_db(collection_name):
