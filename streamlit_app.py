@@ -126,7 +126,7 @@ if uploaded_file is not None:
 
     if uploaded_file.name in collection_names:
         vector_db = QdrantVectorStore.from_existing_collection(
-            client=clientQ,
+            url=os.getenv("QDRANT_URL"),
             collection_name=uploaded_file.name,
             embedding=embedding_model,
             api_key=os.getenv("QDRANT_API_KEY")
