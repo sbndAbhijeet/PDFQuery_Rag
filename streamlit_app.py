@@ -108,7 +108,7 @@ if uploaded_file is not None:
 
             embedding_model = OpenAIEmbeddings(
                                     model="text-embedding-3-large",
-                                    openai_api_key=os.getenv("OPENAI_API_KEY")
+                                    openai_api_key=st.session_state["openai_api_key"]
                                 )
             st.success("🎉 OpenAI client initialized successfully!")
         except Exception as e:
