@@ -4,7 +4,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
@@ -28,13 +28,13 @@ def create_vector_db(saved_file,uploaded_file):
         chunk_size=1000,
         chunk_overlap=400,
     )
-
+ 
     split_docs = text_splitter.split_documents(documents=docs)
 
     #creating Vector embeddings
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
-        google_api_key=st.session_state["gemini_api_key"]
+    embeddings = OpenAIEmbeddings(
+        model="text-embedding-3-large",
+        openai_api_key=st.session_state["openai_api_key"]
     )
 
     # Retry in case the new cluster is still waking up
