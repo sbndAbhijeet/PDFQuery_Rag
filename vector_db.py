@@ -38,7 +38,7 @@ def create_vector_db(saved_file,uploaded_file):
 
     vector_store = QdrantVectorStore.from_documents(
         documents=split_docs,
-        url=qdrant_url,
+        url=os.getenv("QDRANT_URL"),
         collection_name=uploaded_file.name,
         embedding=embeddings
     )
