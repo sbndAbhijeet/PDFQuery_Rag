@@ -11,7 +11,10 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 load_dotenv()
 
-
+client = QdrantClient(
+    url=os.getenv("QDRANT_URL"),
+    api_key=os.getenv("QDRANT_API_KEY")
+)
 
 def create_vector_db(saved_file,uploaded_file):
     #Book in injested
@@ -34,11 +37,20 @@ def create_vector_db(saved_file,uploaded_file):
         google_api_key=st.session_state["gemini_api_key"]
     )
 
+    # Retry in case the new cluster is still waking up
+    for _ in range(5):
+        try:
+            _ = client.collection_exists(uploaded_file.name)
+            break
+        except Exception as e:
+            print("Qdrant cluster not ready, retrying in 3s...", e)
+            time.sleep(3)
+
     #storing vectordb in qdrant
 
     vector_store = QdrantVectorStore.from_documents(
         documents=split_docs,
-        url=os.getenv("QDRANT_URL"),
+        client=client,
         collection_name=uploaded_file.name,
         embedding=embeddings
     )
@@ -46,10 +58,7 @@ def create_vector_db(saved_file,uploaded_file):
     return True
 
 
-client = QdrantClient(
-    url=os.getenv("QDRANT_URL"),
-    api_key=os.getenv("QDRANT_API_KEY")
-)
+
 
 def delete_vector_db(collection_name):
     try:
