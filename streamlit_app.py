@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 from vector_db import delete_vector_db, create_vector_db
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 import os, json
 from dotenv import load_dotenv
@@ -36,10 +36,10 @@ set_background_image("https://media.istockphoto.com/id/1434278254/vector/blue-an
 st.header("PDFQuery 🗣️ (Talk with your pdf)")
 
 with st.sidebar:
-    st.header("🔐 Gemini API Configuration")
+    st.header("🔐 OpenAI API Configuration")
     st.write(f"If you don't have create one its free: ")
-    st.link_button("click here","https://aistudio.google.com/app/apikey")
-    api_key_input = st.text_input("Enter Gemini API Key", type="password")
+    st.link_button("click here","https://platform.openai.com/api-keys")
+    api_key_input = st.text_input("Enter OpenAI API Key", type="password")
 
     connect = st.button("Connect")
 
@@ -47,7 +47,7 @@ with st.sidebar:
 api_key = ''
 if connect:
     if api_key_input:
-        st.session_state["gemini_api_key"] = api_key_input
+        st.session_state["openai_api_key"]= api_key_input
         api_key = api_key_input
         st.success("✅ API key saved in session.")
     else:
@@ -102,22 +102,19 @@ if uploaded_file is not None:
         st.rerun()
 
 
-    if "gemini_api_key" in st.session_state:
+    if "openai_api_key" in st.session_state:
         try:
-            client = OpenAI(
-                api_key=st.session_state["gemini_api_key"],
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-            )
+            client = OpenAI(api_key=st.session_state["openai_api_key"])
 
-            embedding_model = GoogleGenerativeAIEmbeddings(
-                google_api_key=st.session_state["gemini_api_key"],
-                model="models/embedding-001"
-            )
-            st.success("🎉 Gemini client initialized successfully!")
+            embedding_model = OpenAIEmbeddings(
+                                    model="text-embedding-3-large",
+                                    openai_api_key=os.getenv("OPENAI_API_KEY")
+                                )
+            st.success("🎉 OpenAI client initialized successfully!")
         except Exception as e:
-            st.error(f"🚨 Failed to initialize Gemini client: {e}")
+            st.error(f"🚨 Failed to initialize openai client: {e}")
     else:
-        st.warning("🔑 Please enter your Gemini API key in the sidebar.")
+        st.warning("🔑 Please enter your OpenAI API key in the sidebar.")
 
 
     clientQ = QdrantClient(
@@ -170,7 +167,7 @@ if uploaded_file is not None:
 
         messages.append({"role": "user", "content": USER_MESSAGE})
         response = client.chat.completions.create(
-            model="gemini-2.0-flash",
+            model="gpt-3.5-turbo",
             messages=messages
         )
 
