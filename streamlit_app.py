@@ -10,8 +10,6 @@ from qdrant_client import QdrantClient
 
 load_dotenv()
 
-qdrant_url = "https://53aa128e-3d01-47a3-8c47-590f48a94dd2.europe-west3-0.gcp.cloud.qdrant.io:6333"
-
 if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -123,7 +121,7 @@ if uploaded_file is not None:
 
 
     clientQ = QdrantClient(
-        url=qdrant_url,
+        url=os.getenv("QDRANT_URL"),
         api_key=os.getenv("QDRANT_API_KEY")
     )
     collections = clientQ.get_collections().collections
