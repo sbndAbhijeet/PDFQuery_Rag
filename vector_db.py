@@ -50,7 +50,8 @@ def create_vector_db(saved_file,uploaded_file):
 
     vector_store = QdrantVectorStore.from_documents(
         documents=split_docs,
-        client=client,
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY"),
         collection_name=uploaded_file.name,
         embedding=embeddings
     )
